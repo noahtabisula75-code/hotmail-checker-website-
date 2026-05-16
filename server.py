@@ -13,6 +13,9 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_socketio import SocketIO, emit
 
@@ -21,7 +24,7 @@ from flask_socketio import SocketIO, emit
 # ------------------------------------------------------------
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'change-me-to-something-random')
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 MOBILE_UAS = [
     "Dalvik/2.1.0 (Linux; U; Android 9; SM-G975N Build/PQ3B.190801.08041932)",
@@ -300,7 +303,7 @@ def handle_start_scan(config):
 
             socketio.emit('stats_update', stats)
 
-    # Run in thread pool
+    # Run in thread pool (using eventlet's pool is possible, but threading is fine)
     with ThreadPoolExecutor(max_workers=threads_count) as executor:
         futures = [executor.submit(process_line, line) for line in lines]
         # Wait for all to complete (or stop signal)
@@ -341,4 +344,5 @@ def index():
 if __name__ == '__main__':
     os.makedirs('downloads', exist_ok=True)
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, debug=False, host='0.0.0.0', port=port)
+    # Use eventlet web server (production safe)
+    socketio.run(app, debug=False, host='0.0.0.0', port=port, server='eventlet')
