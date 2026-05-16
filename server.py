@@ -2,6 +2,9 @@
 """
 Multi-Checker Web Server – Hotmail/Outlook Account Checker
 """
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import re
 import uuid
@@ -13,9 +16,6 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
-import eventlet
-eventlet.monkey_patch()
-
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_socketio import SocketIO, emit
 
@@ -303,10 +303,9 @@ def handle_start_scan(config):
 
             socketio.emit('stats_update', stats)
 
-    # Run in thread pool (using eventlet's pool is possible, but threading is fine)
+    # Run in thread pool
     with ThreadPoolExecutor(max_workers=threads_count) as executor:
         futures = [executor.submit(process_line, line) for line in lines]
-        # Wait for all to complete (or stop signal)
         for f in as_completed(futures):
             if stop_event.is_set():
                 break
@@ -344,5 +343,5 @@ def index():
 if __name__ == '__main__':
     os.makedirs('downloads', exist_ok=True)
     port = int(os.environ.get('PORT', 5000))
-    # Use eventlet web server (production safe)
-    socketio.run(app, debug=False, host='0.0.0.0', port=port, server='eventlet')
+    # Production-ready start – NO 'server=' argument
+    socketio.run(app, host='0.0.0.0', port=port)
