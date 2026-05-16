@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Checker v5.0 – Web Edition</title>
+    <style>
+        :root {
+            --bg: #0b0d17;
+            --surface: rgba(20, 22, 37, 0.8);
+            --surface2: rgba(25, 27, 45, 0.9);
+            --border: rgba(255, 255, 255, 0.06);
+            --cyan: #00e5ff;
+            --green: #00e676;
+            --red: #ff1744;
+            --yellow: #ffd740;
+            --magenta: #e040fb;
+            --blue: #448aff;
+            --white: #e0e0e0;
+            --dim: #6c7080;
+            --gold: #ffab00;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 30% 20%, rgba(0, 229, 255, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(224, 64, 251, 0.05) 0%, transparent 60%);
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        /* Glass card */
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s, transform 0.2s;
+        }
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .card h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--cyan);
+            margin-bottom: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 900px) {
+            .grid-2,
+            .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 500px) {
+            .grid-2,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form elements */
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--dim);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.08);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+        }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7080' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 44px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-transform: uppercase;
+            min-width: 140px;
+        }
+        .btn-cyan {
+            background: var(--cyan);
+            color: #000;
+        }
+        .btn-cyan:hover {
+            background: #00fbff;
+            box-shadow: 0 0 24px rgba(0, 229, 255, 0.3);
+        }
+        .btn-red {
+            background: var(--red);
+            color: #fff;
+        }
+        .btn-red:hover {
+            background: #ff3860;
+        }
+        .btn-green {
+            background: var(--green);
+            color: #000;
+        }
+        .btn-green:hover {
+            background: #00ff7a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--white);
+        }
+        .btn-outline:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 11px;
+            min-width: auto;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Stat boxes */
+        .stat-box {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .stat-icon {
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--dim);
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-top: 2px;
+        }
+        .stat-cyan .stat-value {
+            color: var(--cyan);
+        }
+        .stat-green .stat-value {
+            color: var(--green);
+        }
+        .stat-red .stat-value {
+            color: var(--red);
+        }
+        .stat-yellow .stat-value {
+            color: var(--yellow);
+        }
+        .stat-magenta .stat-value {
+            color: var(--magenta);
+        }
+        .stat-blue .stat-value {
+            color: var(--blue);
+        }
+        .stat-gold .stat-value {
+            color: var(--gold);
+        }
+        .stat-orange .stat-value {
+            color: #ff9100;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            background: var(--surface2);
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            border-radius: 20px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* Live feed */
+        .live-feed {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .live-feed .log-hit {
+            color: var(--green);
+        }
+        .live-feed .log-2fa {
+            color: var(--yellow);
+        }
+        .live-feed .log-bad {
+            color: var(--red);
+        }
+        .live-feed .log-info {
+            color: var(--dim);
+        }
+        .live-feed .log-premium {
+            color: var(--magenta);
+        }
+        .live-feed .log-game {
+            color: var(--blue);
+        }
+        .live-feed .log-money {
+            color: var(--gold);
+        }
+
+        /* Mode pills */
+        .mode-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .mode-pill {
+            padding: 8px 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--dim);
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .mode-pill:hover {
+            border-color: var(--cyan);
+            color: #fff;
+        }
+        .mode-pill.active {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 14px rgba(0, 229, 255, 0.15);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .text-dim {
+            color: var(--dim);
+            font-size: 12px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast-success {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--green);
+        }
+        .toast-error {
+            background: rgba(255, 23, 68, 0.15);
+            color: var(--red);
+        }
+        .toast-info {
+            background: rgba(0, 229, 255, 0.15);
+            color: var(--cyan);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:32px;">
+            <div style="font-family:'Fira Code',monospace;font-size:14px;color:var(--cyan);line-height:1.2;">
+                ╔════════════════════════════════════════════════╗<br>
+                ║     🔮  MULTI-CHECKER v5.0  —  WEB EDITION     ║<br>
+                ╚════════════════════════════════════════════════╝
+            </div>
+            <div style="color:var(--dim);font-size:11px;margin-top:6px;">Fast · Secure · Real‑time</div>
+        </div>
+
+        <!-- Scan Configuration -->
+        <div class="card">
+            <h3>⚙️ Scan Configuration</h3>
+            <div class="grid-2">
+                <div>
+                    <label>Check Mode</label>
+                    <div class="mode-pills" id="modePills">
+                        <span class="mode-pill active" data-mode="full">🔍 Full Scan</span>
+                        <span class="mode-pill" data-mode="microsoft">💻 Microsoft</span>
+                        <span class="mode-pill" data-mode="gaming">🎮 Gaming</span>
+                        <span class="mode-pill" data-mode="mobile">📱 Mobile</span>
+                        <span class="mode-pill" data-mode="social">👥 Social</span>
+                        <span class="mode-pill" data-mode="finance">💰 Finance</span>
+                        <span class="mode-pill" data-mode="streaming">📺 Streaming</span>
+                        <span class="mode-pill" data-mode="hotmail">📧 Hotmail+KW</span>
+                        <span class="mode-pill" data-mode="custom">🎯 Custom</span>
+                    </div>
+                    <input type="hidden" id="checkMode" value="full">
+                </div>
+                <div>
+                    <label>⚡ Threads (1‑50)</label>
+                    <input type="number" id="threads" value="5" min="1" max="50">
+                </div>
+            </div>
+            <div id="customServiceRow" class="hidden" style="margin-top:16px;">
+                <label>🎯 Select Service</label>
+                <select id="customService"></select>
+            </div>
+            <div id="keywordRow" class="hidden" style="margin-top:16px;">
+                <label>🔑 Keywords (one per line)</label>
+                <textarea id="keywordsInput" placeholder="netflix&#10;paypal&#10;amazon"></textarea>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="card">
+            <h3>📥 Account Input</h3>
+            <div class="grid-2">
+                <div>
+                    <label>Single Account</label>
+                    <div class="flex-row" style="flex-wrap:wrap;">
+                        <input type="text" id="singleEmail" placeholder="email@hotmail.com" style="flex:1;">
+                        <input type="password" id="singlePass" placeholder="Password" style="flex:1;">
+                    </div>
+                    <button class="btn btn-cyan btn-sm" onclick="checkSingle()" style="margin-top:12px;">🔎 Check Single</button>
+                </div>
+                <div>
+                    <label>📂 Bulk Combo File (email:pass per line)</label>
+                    <input type="file" id="comboFile" accept=".txt">
+                    <span class="text-dim" id="fileInfo"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telegram (optional) -->
+        <div class="card">
+            <h3>📡 Telegram Notifications (Optional)</h3>
+            <div class="grid-2">
+                <div>
+                    <label>Bot Token</label>
+                    <input type="text" id="tgToken" placeholder="123456:ABC...">
+                </div>
+                <div>
+                    <label>Chat ID</label>
+                    <input type="text" id="tgChatId" placeholder="-100123...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex-row" style="margin-bottom:20px;flex-wrap:wrap;">
+            <button class="btn btn-green" id="btnStart" onclick="startScan()">🚀 Start Scan</button>
+            <button class="btn btn-red hidden" id="btnStop" onclick="stopScan()">⏹️ Stop</button>
+            <button class="btn btn-outline btn-sm" onclick="clearFeed()">🧹 Clear Feed</button>
+            <button class="btn btn-outline btn-sm" id="btnDownload" onclick="downloadResults()" disabled>📥 Download</button>
+        </div>
+
+        <!-- Live Stats -->
+        <div class="card" id="statsCard">
+            <h3>📊 Live Statistics</h3>
+            <div class="grid-4" id="statsGrid">
+                <div class="stat-box stat-cyan"><div class="stat-icon">📁</div><div class="stat-label">Checked</div><div class="stat-value" id="statChecked">0</div></div>
+                <div class="stat-box stat-green"><div class="stat-icon">✅</div><div class="stat-label">Hits</div><div class="stat-value" id="statHits">0</div></div>
+                <div class="stat-box stat-red"><div class="stat-icon">🚫</div><div class="stat-label">Bad</div><div class="stat-value" id="statBads">0</div></div>
+                <div class="stat-box stat-yellow"><div class="stat-icon">🔐</div><div class="stat-label">2FA</div><div class="stat-value" id="stat2FA">0</div></div>
+                <div class="stat-box stat-magenta"><div class="stat-icon">💎</div><div class="stat-label">Premium</div><div class="stat-value" id="statPremium">0</div></div>
+                <div class="stat-box stat-blue"><div class="stat-icon">🎮</div><div class="stat-label">Games</div><div class="stat-value" id="statGames">0</div></div>
+                <div class="stat-box stat-gold"><div class="stat-icon">💰</div><div class="stat-label">Money</div><div class="stat-value" id="statMoney">0</div></div>
+                <div class="stat-box stat-orange"><div class="stat-icon">⚡</div><div class="stat-label">CPM</div><div class="stat-value" id="statCPM">0</div></div>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <span class="text-dim" id="progressText">Ready to scan...</span>
+        </div>
+
+        <!-- Live Feed -->
+        <div class="card">
+            <h3>📜 Live Feed</h3>
+            <div class="live-feed" id="liveFeed">
+                <span class="log-info">⟳ System ready. Upload a combo file to begin.</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align:center;padding:20px;color:var(--dim);font-size:11px;border-top:1px solid var(--border);margin-top:20px;">
+            Multi-Checker v5.0 · Open Source · Real‑time scanning
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        let scanRunning = false;
+        let totalLines = 0;
+        let resultData = { hits: [], twofas: [] };
+
+        // DOM shortcuts
+        const $ = (s) => document.querySelector(s);
+
+        // Populate custom service dropdown
+        const SERVICES_KEYS = [
+            "Facebook", "Instagram", "TikTok", "Twitter", "LinkedIn", "Reddit", "Snapchat", "WhatsApp",
+            "Telegram", "Discord", "Netflix", "Spotify", "Twitch", "YouTube", "Disney+", "Hulu",
+            "Amazon", "eBay", "PayPal", "Steam", "Xbox", "PlayStation", "Epic Games", "Roblox",
+            "Minecraft", "Garena", "Moonton", "Coda"
+        ];
+        const customSelect = $('#customService');
+        SERVICES_KEYS.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            customSelect.appendChild(opt);
+        });
+
+        // Mode pills
+        document.querySelectorAll('.mode-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove(
+                    'active'));
+                pill.classList.add('active');
+                const mode = pill.dataset.mode;
+                $('#checkMode').value = mode;
+                $('#customServiceRow').classList.toggle('hidden', mode !== 'custom');
+                $('#keywordRow').classList.toggle('hidden', mode !== 'hotmail');
+            });
+        });
+
+        // File input
+        document.getElementById('comboFile').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n').filter(l => l.trim() && l.includes(':'));
+                totalLines = lines.length;
+                document.getElementById('fileInfo').textContent =
+                    `📄 ${file.name} — ${totalLines.toLocaleString()} accounts`;
+                document.getElementById('btnStart').disabled = false;
+            };
+            reader.readAsText(file);
+        });
+
+        // Feed helpers
+        function addFeedLine(icon, msg, cls) {
+            const feed = $('#liveFeed');
+            const div = document.createElement('div');
+            div.className = cls || 'log-info';
+            div.textContent = `${icon} ${msg}`;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+            while (feed.children.length > 500) feed.removeChild(feed.firstChild);
+        }
+
+        function clearFeed() {
+            $('#liveFeed').innerHTML = '<span class="log-info">⟳ Feed cleared.</span>';
+        }
+
+        function showToast(msg, type) {
+            const container = $('#toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function setScanState(run) {
+            scanRunning = run;
+            $('#btnStart').classList.toggle('hidden', run);
+            $('#btnStop').classList.toggle('hidden', !run);
+            document.getElementById('comboFile').disabled = run;
+            document.getElementById('singleEmail').disabled = run;
+            document.getElementById('singlePass').disabled = run;
+            document.getElementById('threads').disabled = run;
+            document.querySelectorAll('.mode-pill').forEach(p => p.style.pointerEvents = run ? 'none' :
+                'auto');
+        }
+
+        // Single check
+        function checkSingle() {
+            const email = document.getElementById('singleEmail').value.trim();
+            const password = document.getElementById('singlePass').value.trim();
+            if (!email || !password) return showToast('Enter email and password', 'error');
+            socket.emit('check_single', { email, password });
+            addFeedLine('⟳', `Checking: ${email}`, 'log-info');
+        }
+
+        // Start scan
+        function startScan() {
+            if (scanRunning) return;
+            const file = document.getElementById('comboFile').files[0];
+            if (!file) return showToast('Please select a combo file', 'error');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n').filter(l => l.trim() && l.includes(':'));
+                if (!lines.length) return showToast('No valid combos in file', 'error');
+                totalLines = lines.length;
+                resultData = { hits: [], twofas: [] };
+
+                const config = {
+                    lines,
+                    check_mode: $('#checkMode').value,
+                    custom_service: $('#checkMode').value === 'custom' ? customSelect.value : null,
+                    keywords: $('#checkMode').value === 'hotmail' ?
+                        document.getElementById('keywordsInput').value.split('\n').filter(k => k.trim()) :
+                        [],
+                    threads: parseInt(document.getElementById('threads').value) || 5,
+                    tg_token: document.getElementById('tgToken').value,
+                    tg_chat_id: document.getElementById('tgChatId').value
+                };
+                socket.emit('start_scan', config);
+                setScanState(true);
+                addFeedLine('🚀', `Scan started — ${totalLines.toLocaleString()} accounts`,
+                'log-info');
+            };
+            reader.readAsText(file);
+        }
+
+        function stopScan() {
+            socket.emit('stop_scan');
+            setScanState(false);
+        }
+
+        // Socket events
+        socket.on('stats_update', (d) => {
+            $('#statChecked').textContent = d.checked || 0;
+            $('#statHits').textContent = d.hits || 0;
+            $('#statBads').textContent = d.bads || 0;
+            $('#stat2FA').textContent = d.two_fa || 0;
+            $('#statPremium').textContent = d.premium_hits || 0;
+            $('#statGames').textContent = d.game_hits || 0;
+            $('#statMoney').textContent = d.money_hits || 0;
+            $('#statCPM').textContent = d.cpm || 0;
+            if (totalLines > 0) {
+                const pct = Math.min(100, Math.round((d.checked / totalLines) * 100));
+                $('#progressBar').style.width = pct + '%';
+                $('#progressText').textContent =
+                    `${d.checked}/${totalLines} (${pct}%) — ${d.current_email || ''}`;
+            }
+            if (d.hits > 0) document.getElementById('btnDownload').disabled = false;
+        });
+
+        socket.on('result_line', (d) => {
+            addFeedLine(
+                d.type === 'hit' ? '✅' : d.type === '2fa' ? '🔐' : d.type === 'bad' ? '✗' :
+                d.type === 'premium' ? '💎' : d.type === 'game' ? '🎮' : d.type === 'money' ? '💰' : '•',
+                d.message,
+                `log-${d.type}`
+            );
+        });
+
+        socket.on('scan_complete', (d) => {
+            setScanState(false);
+            resultData = d.results || resultData;
+            addFeedLine('🏁', `Scan complete! Hits: ${d.hits}, 2FA: ${d.two_fa}, Bad: ${d.bads}`,
+            'log-info');
+            document.getElementById('btnDownload').disabled = (d.hits === 0);
+        });
+
+        socket.on('single_result', (data) => {
+            addFeedLine('📋', '--- Single Result ---', 'log-info');
+            if (data.status === 'HIT') {
+                addFeedLine('✅', `HIT: ${data.email}`, 'log-hit');
+                if (data.name) addFeedLine('👤', `Name: ${data.name}`, 'log-info');
+                if (data.country) addFeedLine('🌍', `Country: ${data.country}`, 'log-info');
+                if (data.services_found && data.services_found.length) {
+                    addFeedLine('🔗', `Services: ${data.services_found.map(s => s.name).join(', ')}`,
+                        'log-game');
+                }
+            } else if (data.status === '2FA') {
+                addFeedLine('🔐', `2FA Required: ${data.email}`, 'log-2fa');
+            } else {
+                addFeedLine('✗', `Status: ${data.status}`, 'log-bad');
+            }
+            addFeedLine('📋', '--- End ---', 'log-info');
+        });
+
+        socket.on('error_msg', (d) => {
+            showToast(d.message, 'error');
+            addFeedLine('⚠️', d.message, 'log-bad');
+        });
+
+        // Download results
+        function downloadResults() {
+            let content = '=== HITS ===\n';
+            resultData.hits.forEach(h => {
+                content += `${h.email}:${h.password}`;
+                if (h.country) content += ` | ${h.country}`;
+                if (h.name) content += ` | ${h.name}`;
+                if (h.services_found && h.services_found.length) content +=
+                    ` | ${h.services_found.map(s => s.name).join(', ')}`;
+                content += '\n';
+            });
+            content += '\n=== 2FA ===\n';
+            resultData.twofas.forEach(t => content += `${t.email}:${t.password}\n`);
+            const blob = new Blob([content], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'results.txt';
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('Results downloaded', 'success');
+        }
+    </script>
+</body>
+</html>
